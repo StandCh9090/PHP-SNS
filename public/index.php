@@ -1,12 +1,12 @@
 <?php
 
-define('LARAVEL_START', microtime(true));
+require __DIR__ . '/../app/Support/helpers.php';
+require __DIR__ . '/../app/Core/Autoloader.php';
 
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
-    require $maintenance;
-}
+App\Core\Autoloader::register();
 
-require __DIR__.'/../vendor/autoload.php';
+use App\Core\Session;
 
-(require_once __DIR__.'/../bootstrap/app.php')
-    ->handleRequest(Request::capture());
+Session::start();
+
+App\Core\Router::dispatch();

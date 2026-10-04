@@ -2,54 +2,47 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Config\Database;
+use PDO;
 
-class User extends Authenticatable
+class User
 {
-    use HasFactory, Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public static function create(string $username, string $email, string $password): int
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        $pdo = Database::connection();
+
+        $statement = $pdo->prepare(
+            'INSERT INTO users (username, email, password_hash) VALUES (:username, :email, :password_hash)'
+        );
+
+        $statement->execute([
+            ':username' => $username,
+            ':email' => $email,
+            ':password_hash' => password_hash($password, PASSWORD_DEFAULT),
+        ]);
+
+        return (int) $pdo->lastInsertId();
     }
 
-    /**
-     * ユーザーの投稿リレーション
-     */
-    public function posts(): HasMany
+    public static function findByEmail(string $email): ?array
     {
-        return $this->hasMany(Post::class);
+        $pdo = Database::connection();
+        $statement = $pdo->prepare('SELECT * FROM users WHERE email = :email LIMIT 1');
+        $statement->execute([':email' => $email]);
+
+        $user = $statement->fetch(PDO::FETCH_ASSOC);
+
+        return $user ?: null;
+    }
+
+    public static function findById(int $id): ?array
+    {
+        $pdo = Database::connection();
+        $statement = $pdo->prepare('SELECT * FROM users WHERE id = :id LIMIT 1');
+        $statement->execute([':id' => $id]);
+
+        $user = $statement->fetch(PDO::FETCH_ASSOC);
+
+        return $user ?: null;
     }
 }

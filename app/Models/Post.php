@@ -2,39 +2,35 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Config\Database;
+use PDO;
 
-class Post extends Model
+class Post
 {
-    use HasFactory;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'user_id',
-        'body',
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
-
-    /**
-     * 投稿の作成者
-     */
-    public function user(): BelongsTo
+    public static function create(int $userId, string $body): void
     {
-        return $this->belongsTo(User::class);
+        $pdo = Database::connection();
+        $statement = $pdo->prepare(
+            'INSERT INTO posts (user_id, body) VALUES (:user_id, :body)'
+        );
+
+        $statement->execute([
+            ':user_id' => $userId,
+            ':body' => trim($body),
+        ]);
+    }
+
+    public static function all(): array
+    {
+        $pdo = Database::connection();
+
+        $statement = $pdo->query(
+            'SELECT p.*, u.username
+             FROM posts p
+             INNER JOIN users u ON u.id = p.user_id
+             ORDER BY p.created_at DESC'
+        );
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 }
