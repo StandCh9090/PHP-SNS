@@ -1,43 +1,16 @@
 {
   "name": "standch9090/php-sns",
-  "description": "SNS application built with Laravel",
+  "description": "Simple PHP SNS starter project",
   "type": "project",
   "require": {
-    "php": "^8.2",
-    "laravel/framework": "^11.0",
-    "laravel/tinker": "^2.8"
-  },
-  "require-dev": {
-    "laravel/pint": "^1.13",
-    "laravel/sail": "^1.26",
-    "pestphp/pest": "^2.34",
-    "pestphp/pest-plugin-laravel": "^2.0"
+    "php": ">=8.1"
   },
   "autoload": {
     "psr-4": {
-      "App\\": "app/",
-      "Database\\Factories\\": "database/factories/",
-      "Database\\Seeders\\": "database/seeders/"
+      "App\\": "app/"
     }
   },
   "scripts": {
-    "post-autoload-dump": [
-      "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-      "@php artisan package:discover --ansi"
-    ],
-    "post-update-cmd": [
-      "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
-    ],
-    "post-root-package-install": [
-      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
-    ],
-    "post-create-project-cmd": [
-      "@php artisan key:generate --ansi"
-    ]
-  },
-  "config": {
-    "allow-plugins": {
-      "pestphp/pest-plugin-laravel": true
-    }
+    "start": "php -S localhost:8000 -t public"
   }
 }
